@@ -1,6 +1,6 @@
 import requests
+from keys import ACADVIEW_ACCESS_TOKEN, APP_ACCESS_TOKEN
 
-APP_ACCESS_TOKEN = '1552131007.4d42521.8c396ed2781a4c4b9a79c70ecee5709c'
 #Token Owner : subtlyperfect
 #Sandbox Users : palakkhanna19, muskaanlaroia, sazia_khanna
 
