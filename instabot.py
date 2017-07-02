@@ -1,4 +1,4 @@
-import requests, urllib, wordcloud
+import requests, urllib, wordcloud, matplotlib
 from keys import SURBHI_ACCESS_TOKEN, APP_ACCESS_TOKEN
 from textblob import TextBlob
 from textblob.sentiments import NaiveBayesAnalyzer
@@ -186,7 +186,6 @@ def view_comments(insta_username):
     request_url = (BASE_URL + "media/%s/comments?access_token=%s") %(media_id, SURBHI_ACCESS_TOKEN)
     print "GET request URL: %s" %(request_url)
     user_comments = requests.get(request_url).json()
-    comments_list = []
 
     if user_comments["meta"]["code"] == 200:
         if len(user_comments["data"]):
@@ -223,6 +222,25 @@ def liked_media():
         exit()
 
 
+#Fetch hashtags to find subtrends.
+
+
+def tag_info(insta_username):
+    user_id = get_user_id(insta_username)
+    request_url = (BASE_URL + "users/%s/media/recent/?access_token=%s") % (user_id, SURBHI_ACCESS_TOKEN)
+    print "GET request url: %s" % (request_url)
+    tag_information = requests.get(request_url).json()
+
+    if tag_information["meta"]["code"] == 200:
+        if len(tag_information["data"]):
+            for x in range(0, len(tag_information["data"])):
+                print tag_information["data"][x]["tags"]
+
+    else:
+        print "Status code other than 200 received!"
+        exit()
+
+
 #Function to display menu options for the user.
 
 
@@ -239,7 +257,9 @@ def start_bot():
         print "f. Comment on the most recent post of another user."
         print "g. View the list of comments on the most recent post of a user."
         print "h. Fetch the last post you liked."
-        print "i. Exit"
+        print "i. Delete negative comments."
+        print "j. Fetch tags."
+        print "k. Exit."
 
         choice = raw_input("Enter you choice: ")
 
@@ -265,6 +285,11 @@ def start_bot():
         elif choice == "h":
             liked_media()
         elif choice == "i":
+            print "Go die."
+        elif choice == "j":
+            insta_username = raw_input("Username: ")
+            tag_info(insta_username)
+        elif choice == "k":
             exit()
         else:
             print "wrong choice"
