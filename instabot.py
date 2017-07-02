@@ -1,5 +1,7 @@
 import requests, urllib, wordcloud
 from keys import SURBHI_ACCESS_TOKEN, APP_ACCESS_TOKEN
+from textblob import TextBlob
+from textblob.sentiments import NaiveBayesAnalyzer
 
 #Token Owner : Surbhi Sood (@subtlyperfect)
 #Sandbox Users : @thethresholdtoinfinity, @acadsquad, @accountthepublic, @_as1228_
@@ -184,10 +186,12 @@ def view_comments(insta_username):
     request_url = (BASE_URL + "media/%s/comments?access_token=%s") %(media_id, SURBHI_ACCESS_TOKEN)
     print "GET request URL: %s" %(request_url)
     user_comments = requests.get(request_url).json()
+    comments_list = []
 
     if user_comments["meta"]["code"] == 200:
         if len(user_comments["data"]):
-            print user_comments["data"][0]["text"]
+            for x in range(0, len(user_comments["data"])):
+                print user_comments["data"][x]["text"]
         else:
             print "There are no comments on the post!"
             exit()
@@ -196,15 +200,21 @@ def view_comments(insta_username):
         exit()
 
 
+#Function to fetch the most recently liked media by the owner of access token.
+
+
 def liked_media():
-    request_url = (BASE_URL + "v1/users/self/media/liked?access_token=%s") %(SURBHI_ACCESS_TOKEN)
-    print "GET request URL: %s" %(request_url)
-    user_media = requests.get(request_url).json()
+    request_url = (BASE_URL + "users/self/media/liked?access_token=%s") %(SURBHI_ACCESS_TOKEN)
+    print "GET request url: %s" %(request_url)
+    payload = {"access_token": SURBHI_ACCESS_TOKEN}
+    user_media = requests.get(request_url, payload).json()
 
     if user_media['meta']['code'] == 200:
         if len(user_media['data']):
-            image_name = user_media['data'][0]['id']
-            print image_name
+            image_name = user_media["data"][0]["id"] + ".jpeg"
+            image_url = user_media["data"][0]["images"]["standard_resolution"]["url"]
+            urllib.urlretrieve(image_url, image_name)
+            print "The recently liked image with id " + image_name + " has been downloaded!"
         else:
             print "No media liked."
             exit()
@@ -213,23 +223,22 @@ def liked_media():
         exit()
 
 
-def get_tag_info():
-    request_url
+#Function to display menu options for the user.
 
 
 def start_bot():
     while True:
-        print '\n'
-        print 'Hey! Welcome to instaBot!'
-        print 'Here are your menu options:'
-        print "a. Get your own details\n"
-        print "b. Get details of a user by username\n"
-        print "c. Get your own recent post\n"
-        print "d. Get the recent post of a user by username\n"
-        print "e. Like the recent post.\n"
-        print "f. Comment on the recent post.\n"
-        print "g. View recent comments. \n"
-        print "h. Get the recently liked media. \n"
+        print "\n"
+        print "Hey! Welcome to InstaBot."
+        print "What would you like to do?"
+        print "a. Fetch your own information."
+        print "b. Fetch the details of another user."
+        print "c. Fetch your most recent post."
+        print "d. Fetch the most recent post of another user."
+        print "e. Like the most recent post of another user."
+        print "f. Comment on the most recent post of another user."
+        print "g. View the list of comments on the most recent post of a user."
+        print "h. Fetch the last post you liked."
         print "i. Exit"
 
         choice = raw_input("Enter you choice: ")
@@ -237,18 +246,18 @@ def start_bot():
         if choice == "a":
             self_info()
         elif choice == "b":
-            insta_username = raw_input("Enter the username of the user: ")
+            insta_username = raw_input("Enter the username: ")
             get_user_info(insta_username)
         elif choice == "c":
             get_own_post()
         elif choice == "d":
-            insta_username = raw_input("Enter the username of the user: ")
+            insta_username = raw_input("Enter the username: ")
             get_user_post(insta_username)
         elif choice == "e":
-            insta_username = raw_input("Enter the username of the user: ")
+            insta_username = raw_input("Enter the username: ")
             like_a_post(insta_username)
         elif choice == "f":
-            insta_username = raw_input("Enter the username:")
+            insta_username = raw_input("Enter the username: ")
             post_a_comment(insta_username)
         elif choice == "g":
             insta_username = raw_input("Enter the username: ")
