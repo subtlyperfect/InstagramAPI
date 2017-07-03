@@ -222,23 +222,37 @@ def liked_media():
         exit()
 
 
-#Fetch hashtags to find subtrends.
+#Function to delete negative comments.
 
 
-def tag_info(insta_username):
-    user_id = get_user_id(insta_username)
-    request_url = (BASE_URL + "users/%s/media/recent/?access_token=%s") % (user_id, SURBHI_ACCESS_TOKEN)
-    print "GET request url: %s" % (request_url)
-    tag_information = requests.get(request_url).json()
+def del_negative_comment(insta_username):
+    media_id = get_post_id(insta_username)
+    request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, SURBHI_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    comment_info = requests.get(request_url).json()
 
-    if tag_information["meta"]["code"] == 200:
-        if len(tag_information["data"]):
-            for x in range(0, len(tag_information["data"])):
-                print tag_information["data"][x]["tags"]
+    if comment_info['meta']['code'] == 200:
+        if len(comment_info['data']):
+            for x in range(0, len(comment_info['data'])):
+                comment_id = comment_info['data'][x]['id']
+                comment_text = comment_info['data'][x]['text']
+                blob = TextBlob(comment_text, analyzer=NaiveBayesAnalyzer())
+                if (blob.sentiment.p_neg > blob.sentiment.p_pos):
+                    print 'Negative comment : %s' % (comment_text)
+                    delete_url = (BASE_URL + 'media/%s/comments/%s/?access_token=%s') % (media_id, comment_id, SURBHI_ACCESS_TOKEN)
+                    print 'DELETE request url : %s' % (delete_url)
+                    delete_info = requests.delete(delete_url).json()
 
+                    if delete_info['meta']['code'] == 200:
+                        print 'Comment successfully deleted!\n'
+                    else:
+                        print 'Unable to delete comment!'
+                else:
+                    print 'Positive comment : %s\n' % (comment_text)
+        else:
+            print 'There are no existing comments on the post!'
     else:
-        print "Status code other than 200 received!"
-        exit()
+        print 'Status code other than 200 received!'
 
 
 #Function to display menu options for the user.
@@ -285,7 +299,8 @@ def start_bot():
         elif choice == "h":
             liked_media()
         elif choice == "i":
-            print "Go die."
+            insta_username = raw_input("Enter the username: ")
+            del_negative_comment(insta_username)
         elif choice == "j":
             insta_username = raw_input("Username: ")
             tag_info(insta_username)
