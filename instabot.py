@@ -2,14 +2,17 @@ import requests, urllib, wordcloud, matplotlib
 from keys import SURBHI_ACCESS_TOKEN, APP_ACCESS_TOKEN
 from textblob import TextBlob
 from textblob.sentiments import NaiveBayesAnalyzer
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
 
 #Token Owner : Surbhi Sood (@subtlyperfect)
-#Sandbox Users : @thethresholdtoinfinity, @acadsquad, @accountthepublic, @_as1228_
+#Sandbox Users : @acadsquad, @accountthepublic, @_as1228_, @pktest1111 @thethresholdtoinfinity
 
 BASE_URL = "https://api.instagram.com/v1/"
 
 
-#Function to extract the information about the owner of the access token.
+# Function to extract the information about the owner of the access token.
 
 
 def self_info():
@@ -29,7 +32,7 @@ def self_info():
         print "Status code other than 200 received!"
 
 
-#Function to extract the ID of the user through username.
+# Function to extract the ID of the user through username.
 
 
 def get_user_id(insta_username):
@@ -47,7 +50,7 @@ def get_user_id(insta_username):
         exit()
 
 
-#Function to extract the information of another user when username is known.
+# Function to extract the information of another user when username is known.
 
 def get_user_info(insta_username):
     user_id = get_user_id(insta_username)
@@ -73,7 +76,7 @@ def get_user_info(insta_username):
         print "Status code other than 200 received!"
 
 
-#Function to access your latest post.
+# Function to access your latest post.
 
 
 def get_own_post():
@@ -93,7 +96,7 @@ def get_own_post():
         print "Status code other than 200 received!"
 
 
-#Function to extract the latest post of another user.
+# Function to extract the latest post of another user.
 
 
 def get_user_post(insta_username):
@@ -119,7 +122,7 @@ def get_user_post(insta_username):
         print "Status code other than 200 received!"
 
 
-#Function to extract the ID of the most recent post.
+# Function to extract the ID of the most recent post.
 
 
 def get_post_id(insta_username):
@@ -144,7 +147,7 @@ def get_post_id(insta_username):
         exit()
 
 
-#Function to like the latest post of a user.
+# Function to like the latest post of a user.
 
 
 def like_a_post(insta_username):
@@ -160,7 +163,7 @@ def like_a_post(insta_username):
         print "Your like was unsuccessful. Try again!"
 
 
-#Function to post a comment on the latest post of another user.
+# Function to post a comment on the latest post of another user.
 
 
 def post_a_comment(insta_username):
@@ -178,7 +181,7 @@ def post_a_comment(insta_username):
         print "Unable to add comment. Try again!"
 
 
-#Function to view a list of comments.
+# Function to view a list of comments.
 
 
 def view_comments(insta_username):
@@ -199,7 +202,7 @@ def view_comments(insta_username):
         exit()
 
 
-#Function to fetch the most recently liked media by the owner of access token.
+# Function to fetch the most recently liked media by the owner of access token.
 
 
 def liked_media():
@@ -222,40 +225,73 @@ def liked_media():
         exit()
 
 
-#Function to delete negative comments.
+# Function to delete negative comments.
 
 
 def del_negative_comment(insta_username):
     media_id = get_post_id(insta_username)
-    request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, SURBHI_ACCESS_TOKEN)
-    print 'GET request url : %s' % (request_url)
+    request_url = (BASE_URL + "media/%s/comments/?access_token=%s") % (media_id, SURBHI_ACCESS_TOKEN)
+    print "GET request url : %s" % (request_url)
     comment_info = requests.get(request_url).json()
 
-    if comment_info['meta']['code'] == 200:
-        if len(comment_info['data']):
-            for x in range(0, len(comment_info['data'])):
-                comment_id = comment_info['data'][x]['id']
-                comment_text = comment_info['data'][x]['text']
+    if comment_info["meta"]["code"] == 200:
+        if len(comment_info["data"]):
+            for x in range(0, len(comment_info["data"])):
+                comment_id = comment_info["data"][x]["id"]
+                comment_text = comment_info["data"][x]["text"]
                 blob = TextBlob(comment_text, analyzer=NaiveBayesAnalyzer())
                 if (blob.sentiment.p_neg > blob.sentiment.p_pos):
-                    print 'Negative comment : %s' % (comment_text)
-                    delete_url = (BASE_URL + 'media/%s/comments/%s/?access_token=%s') % (media_id, comment_id, SURBHI_ACCESS_TOKEN)
-                    print 'DELETE request url : %s' % (delete_url)
+                    print "Negative comment found: %s" % (comment_text)
+                    delete_url = (BASE_URL + "media/%s/comments/%s/?access_token=%s") % (media_id, comment_id, SURBHI_ACCESS_TOKEN)
+                    print "DELETE request url : %s" % (delete_url)
                     delete_info = requests.delete(delete_url).json()
 
-                    if delete_info['meta']['code'] == 200:
-                        print 'Comment successfully deleted!\n'
+                    if delete_info["meta"]["code"] == 200:
+                        print "Comment successfully deleted!"
                     else:
-                        print 'Unable to delete comment!'
+                        print "Unable to delete comment!"
                 else:
-                    print 'Positive comment : %s\n' % (comment_text)
+                    print "Positive comment : %s" % (comment_text)
         else:
-            print 'There are no existing comments on the post!'
+            print "There are no existing comments on the post!"
     else:
-        print 'Status code other than 200 received!'
+        print "Status code other than 200 received!"
 
 
-#Function to display menu options for the user.
+# Function find sub-trends for an event or activity and plot a word cloud.
+
+
+def tag_info():
+    tag_dictionary = {}
+    hash_tag = raw_input("Enter the trending tag you want to search: ")
+    request_url = (BASE_URL + "tags/%s/media/recent?access_token=%s") %(hash_tag, SURBHI_ACCESS_TOKEN)
+    print "GET request url: %s" %(request_url)
+    req_media = requests.get(request_url).json()
+
+    if req_media["meta"]["code"] == 200:
+        if req_media["data"]:
+            for x in range(0, len(req_media["data"])):
+                media_id = req_media["data"][x]["tags"]
+
+                for y in range(0,len(media_id)):
+                    if req_media["data"][x]["tags"][y] in tag_dictionary:
+                        tag_dictionary[req_media["data"][x]["tags"][y]] += 1
+                    else:
+                        tag_dictionary[req_media["data"][x]["tags"][y]] = 1
+        else:
+            print "No posts found."
+    else:
+        print "Status code other than 200 received."
+
+    tag_dictionary.pop(hash_tag.lower(), None)
+    print tag_dictionary
+
+    wordcloud = WordCloud().generate_from_frequencies(tag_dictionary)
+    plt.imshow(wordcloud, interpolation="bilinear")
+    plt.show()
+
+
+# Function to display menu options for the user.
 
 
 def start_bot():
@@ -272,7 +308,7 @@ def start_bot():
         print "g. View the list of comments on the most recent post of a user."
         print "h. Fetch the last post you liked."
         print "i. Delete negative comments."
-        print "j. Fetch tags."
+        print "j. Find sub-trends for an event or activity and plot a word cloud."
         print "k. Exit."
 
         choice = raw_input("Enter you choice: ")
@@ -302,8 +338,7 @@ def start_bot():
             insta_username = raw_input("Enter the username: ")
             del_negative_comment(insta_username)
         elif choice == "j":
-            insta_username = raw_input("Username: ")
-            tag_info(insta_username)
+            tag_info()
         elif choice == "k":
             exit()
         else:
