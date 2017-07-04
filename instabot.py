@@ -18,7 +18,7 @@ BASE_URL = "https://api.instagram.com/v1/"
 
 
 def self_info():
-    request_url = (BASE_URL + "users/self/?access_token=%s") % SURBHI_ACCESS_TOKEN
+    request_url = (BASE_URL + "users/self/?access_token=%s") % (SURBHI_ACCESS_TOKEN)
     print "GET request url : %s" % request_url
     user_info = requests.get(request_url).json()
 
@@ -38,8 +38,8 @@ def self_info():
 
 
 def get_user_id(insta_username):
-    request_url = (BASE_URL + "users/search?q=%s&access_token=%s") % insta_username, SURBHI_ACCESS_TOKEN
-    print "GET request url : %s" % request_url
+    request_url =BASE_URL + "users/search?q=%s&access_token=%s" % (insta_username, SURBHI_ACCESS_TOKEN)
+    print "GET request url : %s" % (request_url)
     user_info = requests.get(request_url).json()
 
     if user_info["meta"]["code"] == 200:
@@ -62,8 +62,8 @@ def get_user_info(insta_username):
         print "User does not exist!"
         exit()
 
-    request_url = (BASE_URL + "users/%s?access_token=%s") % user_id, SURBHI_ACCESS_TOKEN
-    print "GET request url : %s" % request_url
+    request_url = BASE_URL + "users/%s/?access_token=%s" % (user_id, SURBHI_ACCESS_TOKEN)
+    print "GET request url : %s" % (request_url)
     print user_id + " is the user ID."
     user_info = requests.get(request_url).json()
 
@@ -83,8 +83,8 @@ def get_user_info(insta_username):
 
 
 def get_own_post():
-    request_url = (BASE_URL + "users/self/media/recent/?access_token=%s") % SURBHI_ACCESS_TOKEN
-    print "GET request url : %s" % request_url
+    request_url = (BASE_URL + "users/self/media/recent/?access_token=%s") % (SURBHI_ACCESS_TOKEN)
+    print "GET request url : %s" % (request_url)
     own_media = requests.get(request_url).json()
 
     if own_media["meta"]["code"] == 200:
@@ -109,8 +109,8 @@ def get_user_post(insta_username):
         print "User does not exist!"
         exit()
 
-    request_url = (BASE_URL + "users/%s/media/recent/?access_token=%s") % user_id, SURBHI_ACCESS_TOKEN
-    print "GET request url : %s" % request_url
+    request_url = (BASE_URL + "users/%s/media/recent/?access_token=%s") % (user_id, SURBHI_ACCESS_TOKEN)
+    print "GET request url : %s" % (request_url)
     user_media = requests.get(request_url).json()
 
     if user_media["meta"]["code"] == 200:
@@ -135,8 +135,8 @@ def get_post_id(insta_username):
         print "User does not exist!"
         exit()
 
-    request_url = (BASE_URL + "users/%s/media/recent/?access_token=%s") % user_id, SURBHI_ACCESS_TOKEN
-    print "GET request url : %s" % request_url
+    request_url = (BASE_URL + "users/%s/media/recent/?access_token=%s") % (user_id, SURBHI_ACCESS_TOKEN)
+    print "GET request url : %s" % (request_url)
     user_media = requests.get(request_url).json()
 
     if user_media["meta"]["code"] == 200:
@@ -155,9 +155,9 @@ def get_post_id(insta_username):
 
 def like_a_post(insta_username):
     media_id = get_post_id(insta_username)
-    request_url = (BASE_URL + "media/%s/likes") % media_id
+    request_url = (BASE_URL + "media/%s/likes") % (media_id)
     payload = {"access_token": SURBHI_ACCESS_TOKEN}
-    print "POST request url : %s" % request_url
+    print "POST request url : %s" % (request_url)
     post_a_like = requests.post(request_url, payload).json()
 
     if post_a_like["meta"]["code"] == 200:
@@ -173,7 +173,7 @@ def post_a_comment(insta_username):
     media_id = get_post_id(insta_username)
     comment_text = raw_input("Your comment: ")
     payload = {"access_token": SURBHI_ACCESS_TOKEN, "text" : comment_text}
-    request_url = (BASE_URL + "media/%s/comments") % media_id
+    request_url = (BASE_URL + "media/%s/comments") % (media_id)
     print "POST request url: %s" % (request_url)
 
     make_comment = requests.post(request_url, payload).json()
@@ -189,8 +189,8 @@ def post_a_comment(insta_username):
 
 def view_comments(insta_username):
     media_id = get_post_id(insta_username)
-    request_url = (BASE_URL + "media/%s/comments?access_token=%s") % media_id, SURBHI_ACCESS_TOKEN
-    print "GET request URL: %s" % request_url
+    request_url = (BASE_URL + "media/%s/comments?access_token=%s") % (media_id, SURBHI_ACCESS_TOKEN)
+    print "GET request URL: %s" % (request_url)
     user_comments = requests.get(request_url).json()
 
     if user_comments["meta"]["code"] == 200:
@@ -209,8 +209,8 @@ def view_comments(insta_username):
 
 
 def liked_media():
-    request_url = (BASE_URL + "users/self/media/liked?access_token=%s") % SURBHI_ACCESS_TOKEN
-    print "GET request url: %s" % request_url
+    request_url = (BASE_URL + "users/self/media/liked?access_token=%s") % (SURBHI_ACCESS_TOKEN)
+    print "GET request url: %s" % (request_url)
     payload = {"access_token": SURBHI_ACCESS_TOKEN}
     user_media = requests.get(request_url, payload).json()
 
@@ -233,8 +233,8 @@ def liked_media():
 
 def del_negative_comment(insta_username):
     media_id = get_post_id(insta_username)
-    request_url = (BASE_URL + "media/%s/comments/?access_token=%s") % media_id, SURBHI_ACCESS_TOKEN
-    print "GET request url : %s" % request_url
+    request_url = (BASE_URL + "media/%s/comments/?access_token=%s") % (media_id, SURBHI_ACCESS_TOKEN)
+    print "GET request url : %s" % (request_url)
     comment_info = requests.get(request_url).json()
 
     if comment_info["meta"]["code"] == 200:
@@ -245,8 +245,8 @@ def del_negative_comment(insta_username):
                 blob = TextBlob(comment_text, analyzer=NaiveBayesAnalyzer())
                 if (blob.sentiment.p_neg > blob.sentiment.p_pos):
                     print "Negative comment found: %s" % comment_text
-                    delete_url = (BASE_URL + "media/%s/comments/%s/?access_token=%s") % media_id, comment_id, SURBHI_ACCESS_TOKEN
-                    print "DELETE request url : %s" % delete_url
+                    delete_url = (BASE_URL + "media/%s/comments/%s/?access_token=%s") % (media_id, comment_id, SURBHI_ACCESS_TOKEN)
+                    print "DELETE request url : %s" % (delete_url)
                     delete_info = requests.delete(delete_url).json()
 
                     if delete_info["meta"]["code"] == 200:
@@ -254,7 +254,7 @@ def del_negative_comment(insta_username):
                     else:
                         print "Unable to delete comment!"
                 else:
-                    print "Positive comment found: %s" % comment_text
+                    print "Positive comment found: %s" % (comment_text)
         else:
             print "There are no existing comments on the post!"
     else:
@@ -267,8 +267,8 @@ def del_negative_comment(insta_username):
 def tag_info():
     tag_dictionary = {}
     hash_tag = raw_input("Enter the trending tag you want to search: ")
-    request_url = (BASE_URL + "tags/%s/media/recent?access_token=%s") % hash_tag, SURBHI_ACCESS_TOKEN
-    print "GET request url: %s" % request_url
+    request_url = (BASE_URL + "tags/%s/media/recent?access_token=%s") % (hash_tag, SURBHI_ACCESS_TOKEN)
+    print "GET request url: %s" % (request_url)
     req_media = requests.get(request_url).json()
 
     if req_media["meta"]["code"] == 200:
@@ -384,7 +384,6 @@ def start_bot():
 
         elif choice == "k":
             exit()
-
 
         else:
             print "wrong choice"
