@@ -38,14 +38,16 @@ def self_info():
 
 
 def get_user_id(insta_username):
-    request_url =BASE_URL + "users/search?q=%s&access_token=%s" % (insta_username, SURBHI_ACCESS_TOKEN)
+    request_url = BASE_URL + "users/search?q=%s&access_token=%s" % (insta_username, SURBHI_ACCESS_TOKEN)
     print "GET request url : %s" % (request_url)
     user_info = requests.get(request_url).json()
 
     if user_info["meta"]["code"] == 200:
         if len(user_info["data"]):
+            print "User Found! ID: " + user_info["data"][0]["id"]
             return user_info["data"][0]["id"]
         else:
+            print "User does not exist!"
             return None
     else:
         print "Status code other than 200 received!"
@@ -303,23 +305,28 @@ def start_bot():
         print "Hey! Welcome to InstaBot."
         print "What would you like to do?"
         print "a. Fetch your own information."
-        print "b. Fetch the details of another user including the user ID."
-        print "c. Fetch your most recent post."
-        print "d. Fetch the most recent post of another user."
-        print "e. Like the most recent post of another user."
-        print "f. Comment on the most recent post of another user."
-        print "g. View the list of comments on the most recent post of a user."
-        print "h. Fetch the last post you liked."
-        print "i. Delete negative comments."
-        print "j. Find sub-trends for an event or activity and plot a word cloud."
-        print "k. Exit."
+        print "b. Get the user ID of another user/ Search for another user."
+        print "c. Fetch the details of another user including the user ID."
+        print "d. Fetch your most recent post."
+        print "e. Fetch the most recent post of another user."
+        print "f. Like the most recent post of another user."
+        print "g. Comment on the most recent post of another user."
+        print "h. View the list of comments on the most recent post of a user."
+        print "i. Fetch the last post you liked."
+        print "k. Delete negative comments."
+        print "k. Find sub-trends for an event or activity and plot a word cloud."
+        print "l. Exit."
 
         choice = raw_input("Enter you choice: ")
 
         if choice == "a":
             self_info()
 
-        elif choice == "b":
+        if choice == "b":
+            insta_username = raw_input("Enter the username you want to search: ")
+            get_user_id(insta_username)
+
+        elif choice == "c":
             insta_username = raw_input("Enter the username: ")
             if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
                 print "Invalid entry. "
@@ -328,17 +335,8 @@ def start_bot():
                 print insta_username
             get_user_info(insta_username)
 
-        elif choice == "c":
-            get_own_post()
-
         elif choice == "d":
-            insta_username = raw_input("Enter the username: ")
-            if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
-                print "Invalid entry. "
-                insta_username = raw_input("Please re-enter a valid name: ")
-            else:
-                print insta_username
-            get_user_post(insta_username)
+            get_own_post()
 
         elif choice == "e":
             insta_username = raw_input("Enter the username: ")
@@ -347,7 +345,7 @@ def start_bot():
                 insta_username = raw_input("Please re-enter a valid name: ")
             else:
                 print insta_username
-            like_a_post(insta_username)
+            get_user_post(insta_username)
 
         elif choice == "f":
             insta_username = raw_input("Enter the username: ")
@@ -356,7 +354,7 @@ def start_bot():
                 insta_username = raw_input("Please re-enter a valid name: ")
             else:
                 print insta_username
-            post_a_comment(insta_username)
+            like_a_post(insta_username)
 
         elif choice == "g":
             insta_username = raw_input("Enter the username: ")
@@ -365,12 +363,21 @@ def start_bot():
                 insta_username = raw_input("Please re-enter a valid name: ")
             else:
                 print insta_username
-            view_comments(insta_username)
+            post_a_comment(insta_username)
 
         elif choice == "h":
-            liked_media()
+            insta_username = raw_input("Enter the username: ")
+            if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
+                print "Invalid entry. "
+                insta_username = raw_input("Please re-enter a valid name: ")
+            else:
+                print insta_username
+            view_comments(insta_username)
 
         elif choice == "i":
+            liked_media()
+
+        elif choice == "j":
             insta_username = raw_input("Enter the username: ")
             if set('[~!@#$%^&*()+{}":;\']+$ " "').intersection(insta_username):
                 print "Invalid entry. "
@@ -379,10 +386,10 @@ def start_bot():
                 print insta_username
             del_negative_comment(insta_username)
 
-        elif choice == "j":
+        elif choice == "k":
             tag_info()
 
-        elif choice == "k":
+        elif choice == "l":
             exit()
 
         else:
